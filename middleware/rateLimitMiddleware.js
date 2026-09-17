@@ -3,9 +3,10 @@ import { ENV } from '../config/env.js';
 
 export const apiLimiter = rateLimit({
   windowMs: ENV.RATE_LIMIT_WINDOW_MS,
-  max: ENV.RATE_LIMIT_MAX,
+  max: ENV.NODE_ENV === 'development' ? 50000 : ENV.RATE_LIMIT_MAX,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: () => ENV.NODE_ENV === 'development',
   message: {
     success: false,
     statusCode: 429,
@@ -15,9 +16,10 @@ export const apiLimiter = rateLimit({
 
 export const authLimiter = rateLimit({
   windowMs: ENV.RATE_LIMIT_WINDOW_MS,
-  max: ENV.AUTH_RATE_LIMIT_MAX,
+  max: ENV.NODE_ENV === 'development' ? 50000 : ENV.AUTH_RATE_LIMIT_MAX,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: () => ENV.NODE_ENV === 'development',
   message: {
     success: false,
     statusCode: 429,

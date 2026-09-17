@@ -19,7 +19,13 @@ const connectDB = async () => {
     return conn;
   } catch (primaryError) {
     console.warn(`\n⚠️  [MongoDB Warning] Primary connection to Atlas failed (${primaryError.message}).`);
-    console.warn('⚠️  Reason: Atlas cluster requires IP Whitelist (0.0.0.0/0) in MongoDB Cloud Console.');
+    if (primaryError.message.includes('auth') || primaryError.message.includes('Authentication failed')) {
+      console.warn('⚠️  Reason: Database Authentication Failed. Please check your Database User username & password in MongoDB Atlas (under Database Access).');
+    } else if (primaryError.message.includes('queryTxt') || primaryError.message.includes('ETIMEDOUT') || primaryError.message.includes('whitelist')) {
+      console.warn('⚠️  Reason: Network/Connection timeout. Check Network Access / IP Whitelist (0.0.0.0/0) in MongoDB Atlas.');
+    } else {
+      console.warn('⚠️  Reason: Could not connect to Atlas cluster. Check your MONGODB_URI in .env.');
+    }
     console.log('🔄 Dev Mode Active: Fallback local store is operational for complete Auth & JWT testing.\n');
     isConnected = false;
     return null;
